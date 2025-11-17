@@ -1,0 +1,60 @@
+import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import EmployeeForm from '../components/EmployeeForm'; // We'll create this next
+import SignaturePad from '../components/SignaturePad'; // And this
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export default function Home() {
+  const [formData, setFormData] = useState({});
+  const [signature, setSignature] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async (data: any, sig: any) => {
+    setFormData(data);
+    setSignature(sig);
+    const { error } = await supabase.from('new_hires').insert([{ data, signature: sig }]);
+    if (!error) setSubmitted(true);
+    // Email notification logic can go here (use Supabase edge functions)
+  };
+
+  if (submitted) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-2xl font-bold">Welcome to ICS!</h1>
+        <p>Your paperwork is submitted. Download your copy:</p>
+        <PDFDownloadLink document={<EmployeePDF data={formData} sig={signature} />} fileName="ics-new-hire-packet.pdf">
+          {({ blob, url, loading, error }) => (loading ? 'Generating...' : 'Download PDF')}
+        </PDFDownloadLink>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <header className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-blue-600">Industrial Containment Solutions LLC</h1>
+        <p className="text-lg">New Hire Onboarding - Rev 11.17.2025</p>
+      </header>
+      <EmployeeForm onSubmit={handleSubmit} />
+    </div>
+  );
+}
+
+// Simple PDF component (expand with your 28 pages)
+import { Document, Page, Text, View } from '@react-pdf/renderer';
+
+const EmployeePDF = ({ data, sig }: { data: any; sig: any }) => (
+  <Document>
+    <Page>
+      <View>
+        <Text>Employee: {data.name}</Text>
+        <Text>Signature: {sig}</Text>
+        {/* Add more pages/forms here matching your PDF */}
+      </View>
+    </Page>
+  </Document>
+);
