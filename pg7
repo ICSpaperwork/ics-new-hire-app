@@ -1,0 +1,69 @@
+import { useState } from 'react';
+
+interface FormData {
+  name: string;
+  ssn: string;
+  address: string;
+  w4Step1: string; // Example fields from W-4
+  i9Status: string; // List A/B/C
+  // Add all your fields: emergencyContact, handbookAck, etc.
+  // For full 28 pages, break into tabs/steps
+}
+
+export default function EmployeeForm({ onSubmit }: { onSubmit: (data: FormData, sig: any) => void }) {
+  const [data, setData] = useState<FormData>({ name: '', ssn: '', address: '', w4Step1: '', i9Status: '' });
+  const [currentStep, setCurrentStep] = useState(1); // Multi-step for 28 pages
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
+
+  const nextStep = () => setCurrentStep(currentStep + 1);
+  const prevStep = () => setCurrentStep(currentStep - 1);
+
+  // Render steps based on your PDF pages (e.g., Step 1: Employee Info, Step 2: W-4, etc.)
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div>
+            <h2>Employee Information</h2>
+            <input name="name" placeholder="Full Name" onChange={handleChange} className="border p-2 mb-2 w-full" />
+            <input name="ssn" placeholder="SSN" onChange={handleChange} className="border p-2 mb-2 w-full" />
+            <input name="address" placeholder="Address" onChange={handleChange} className="border p-2 mb-2 w-full" />
+            <button onClick={nextStep} className="bg-blue-500 text-white p-2">Next</button>
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h2>W-4 Form</h2>
+            <input name="w4Step1" placeholder="Filing Status" onChange={handleChange} className="border p-2 mb-2 w-full" />
+            <button onClick={prevStep}>Back</button>
+            <button onClick={nextStep} className="bg-blue-500 text-white p-2 ml-2">Next</button>
+          </div>
+        );
+      // Add cases for I-9, Direct Deposit, Handbook Ack, etc. up to 28 steps
+      // For acknowledgments: checkboxes like <input type="checkbox" name="handbook" />
+      default:
+        return (
+          <div>
+            <h2>I-9 Verification</h2>
+            <select name="i9Status" onChange={handleChange} className="border p-2 mb-2 w-full">
+              <option>List A</option>
+              <option>List B & C</option>
+            </select>
+            <input type="file" accept="image/*" /> {/* For doc uploads */}
+            <button onClick={prevStep}>Back</button>
+            <button onClick={() => onSubmit(data, 'e-signature-data')} className="bg-green-500 text-white p-2 ml-2">Submit All</button>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <form className="max-w-md mx-auto bg-white p-6 rounded shadow">
+      {renderStep()}
+    </form>
+  );
+}
