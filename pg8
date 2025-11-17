@@ -1,0 +1,31 @@
+import { useRef, useEffect } from 'react';
+import html2canvas from 'html2canvas';
+
+export default function SignaturePad({ onSign }: { onSign: (sig: string) => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+      }
+    }
+  }, []);
+
+  const startDrawing = (e: React.MouseEvent) => {
+    // Basic mouse/touch drawing logic here
+    // On clear/submit, use html2canvas(canvasRef.current).then(canvas => onSign(canvas.toDataURL()))
+  };
+
+  return (
+    <div>
+      <h3>E-Signature</h3>
+      <canvas ref={canvasRef} width={400} height={200} onMouseDown={startDrawing} className="border" />
+      <button onClick={() => {/* Clear logic */}}>Clear</button>
+      <button onClick={() => {/* Submit sig */}}>Sign</button>
+    </div>
+  );
+}
