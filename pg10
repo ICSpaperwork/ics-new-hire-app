@@ -1,0 +1,4 @@
+# Deploy Instructions
+
+1. Install deps: Open terminal in repo folder, run `npm install`.
+2. Supabase: Create project at supabase.com, run this SQL in their editor to create table:
