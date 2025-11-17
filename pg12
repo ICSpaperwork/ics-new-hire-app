@@ -1,0 +1,7 @@
+dd env vars in Vercel: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.
+
+3. Deploy: Go to vercel.com, import your GitHub repo, deploy.
+
+4. Customize: Add more form steps in EmployeeForm.tsx for all 28 pages. For PDF cleaning, upload your scans to Supabase storage and reference as images.
+
+Test: Run `npm run dev` locally first.
